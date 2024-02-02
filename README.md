@@ -1,2 +1,0 @@
-# MySQL
-Campusland MySQL
