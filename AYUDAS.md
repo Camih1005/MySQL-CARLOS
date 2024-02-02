@@ -59,3 +59,6 @@ select * from user where email like '%gmail'; -- esto sera null por que ningun e
 select * from user order by edad asc; -- orden ascendente de la edad
 select * from user order by edad desc; -- orden  descendente de la edad
 select max(edad) as mayor from user;
+select id,name,email from user; -- muestra lo que tu quieras que muestre en la tabla seguido de la coma 
+select id, name as nombre from user;-- ponerle un alias a la colomna name por nombre
+
