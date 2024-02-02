@@ -33,3 +33,29 @@ SELECT * from animales WHERE estado = 'feliz' AND id = 2 AND tipo = 'cata';
 UPDATE animales SET estado = 'Ultrafeliz' WHERE id = 2; -- esto actualiza con el set le agrega un nuevo valor al estado
 DELETE FROM animales WHERE estado = 'feliz';-- ¡¡no se puede por que tiene que ser con un ID!!!
 DELETE FROM animales WHERE id = 1 -- ESTE SI ES VALIDO
+---
+# OTRO CON LAS FUNCIONES PARA BUSQUEDA
+CREATE TABLE user(
+id int not null auto_increment,
+name varchar(50) not null,
+edad int not null, 
+email varchar(100) not null,
+primary key (id)
+);
+INSERT INTO user (name,edad,email) values('Camilo',22,'camiloht@gmail.com');
+INSERT INTO user (name,edad,email) values('Catalina',21,'riverocatalina@gmail.com');
+INSERT INTO user (name,edad,email) values('Andres',23,'andres@gmail.com');
+INSERT INTO user (name,edad,email) values('Rubiela',47,'rubiela@gmail.com');
+
+SELECT * from user;
+SELECT * from user limit 1; -- esto lo que hace es que solo limita la busqueda al primero usuario
+SELECT * from user where edad >= 22; -- busca la edad mayor a 22
+SELECT * FROM user where edad > 20 AND email = 'camiloht@gmail.com' ;
+SELECT * FROM user where edad > 20 or email = 'riverocatalina@gmail.com';
+select * from user where edad != 22; -- diferente a la edad de 22 años
+select * from user where edad between 30 and 50; -- que la edad entre 30 y 50 esten los pone en la tabla
+select * from user where email like '%a@gmail%'; -- esto lo que hace es poder buscar si existe eso entre el email,pero tiene que llevar los dos pocentajes
+select * from user where email like '%gmail'; -- esto sera null por que ningun email termina en gmail
+select * from user order by edad asc; -- orden ascendente de la edad
+select * from user order by edad desc; -- orden  descendente de la edad
+select max(edad) as mayor from user;
