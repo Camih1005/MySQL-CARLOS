@@ -2,10 +2,10 @@
 Campusland MySQL
 ---
 ### Empezando aplicacion
-> create database CamiloNuevo; -- esto es para crear una nueva tabla de base de datos
+ create database CamiloNuevo; -- esto es para crear una nueva tabla de base de datos
 show databases; -- esto es para ver los r3egistros de la base de datos y saber cual se va a utilizar
 use CamiloNuevo; -- Esto es para saber que base de datos se usara
-> -- esto es para crear las condiciones de la tabla, el int despues del id espara que sea entero el id, el tipo varchar es para que sea texto solamente y los numeros es para la cantidad maxima de caracteres
+ -- esto es para crear las condiciones de la tabla, el int despues del id espara que sea entero el id, el tipo varchar es para que sea texto solamente y los numeros es para la cantidad maxima de caracteres
 create table animales(
 id int,
 tipo varchar(255),
