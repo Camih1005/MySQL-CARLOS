@@ -1,7 +1,7 @@
 # MySQL
 Campusland MySQL
 ---
-### Empezando aplicacion
+# Empezando aplicacion
  create database CamiloNuevo; -- esto es para crear una nueva tabla de base de datos
 show databases; -- esto es para ver los r3egistros de la base de datos y saber cual se va a utilizar
 use CamiloNuevo; -- Esto es para saber que base de datos se usara
