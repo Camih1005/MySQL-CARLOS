@@ -62,3 +62,248 @@ select max(edad) as mayor from user;
 select id,name,email from user; -- muestra lo que tu quieras que muestre en la tabla seguido de la coma 
 select id, name as nombre from user;-- ponerle un alias a la colomna name por nombre
 
+
+
+
+
+
+
+-----------------------------
+
+use world;
+
+select * from country;
+select * from city;
+
+select * from countrylanguage;
+
+-- mostrar el pais con mayor poblacion
+
+select Name,Population from country
+order by Population desc
+limit 1; 
+
+select city from Population
+order by Population < 10000000;
+
+select * from country order by Population desc limit 3 ;
+
+select name,LifeExpectancy from(
+select name,Lifeexpectancy
+from country
+where continent = "europe" and Lifeexpectancy <> ""
+order by Lifeexpectancy asc limit 5
+) as Alcontrario order by lifeexpectancy desc limit 5;
+ 
+ select name,Lifeexpectancy
+from country
+where continent = "europe" and Lifeexpectancy <> "nan"
+order by Lifeexpectancy asc limit 5;
+
+-- session 3 gestion de datos SQP
+
+-- crear tablas temporales
+-- para el ejemplo 5 de europa y lifeexpectancy
+
+create table Exp_Vida as
+select name,Lifeexpectancy
+from country as C
+where continent = "europe" and Lifeexpectancy is not null
+order by Lifeexpectancy limit 5;
+
+select * from Exp_Vida;
+
+select * from Exp_Vida order by Lifeexpectancy desc, name;
+
+/* crear una tabla temporal llamada empleados_departamentos_x la
+ cual tendra la informacion de los empleado(nombre y salario) de la 
+ tabla empleados
+ -estos empleados trabajan en el departamento x y ganan mas de 1'200.000
+ */
+ 
+ 
+use mundo;
+ 
+ 
+select * from temp_pais;
+
+create temporary table empleados_dep(
+nombre varchar(50) not null,
+salario int not null check(salario > 1200000));
+
+drop table empleados_dep;
+DESC table empleados_dep;
+
+use world;
+create temporary table temp_pais as 
+select c.name as nombre,c.population as poblacion
+from world.country as c
+where c.population <= 1000000;
+
+drop table temp_pais;
+
+-- relaciones entre tablas
+
+-- uno a muchos
+
+create database biblioteca2;
+
+use biblioteca2;
+
+create table libro(
+ID INT PRIMARY KEY,
+TITULO VARCHAR(100),
+AUTOR VARCHAR(100)
+);
+
+CREATE TABLE Prestamos(
+ID INT PRIMARY KEY,
+ID_LIBRO INT,
+FECHAPRESTAMO DATE,
+FECHADEVOLICION DATE,
+foreign key (id_libro) references libro (id)
+);
+
+-- relacion de muchos a muchos
+
+-- ESTUDIANTE E INSCRIPCION A CURSOS(N:N)
+
+CREATE TABLE estudiante(
+ID INT PRIMARY KEY,
+NOMBRE VARCHAR(100)
+);
+
+CREATE TABLE curso(
+id int primary key,
+nombre varchar(100),
+descripcion text
+);
+
+create table inscripcion(
+idestudiante int,
+idcurso int,
+fechacinscripcion date,
+primary key(idestudiante,idcurso),
+foreign key(idestudiante) references estudiante(ID),
+foreign key(idcurso) references curso(id)
+);
+
+create database IDIOMAS;
+USE IDIOMAS;
+
+create table idioma(
+id int primary key,
+idioma varchar(100)
+);
+
+create table pais(
+idpais int primary key,
+nombre varchar(20),
+continente varchar(50),
+poblacion int
+);
+
+create table idioma_pais(
+id_idioma int,
+id_pais int,
+es_oficial tinyint(1),
+primary key(id_idioma,id_pais),
+foreign key (id_idioma)references idioma(id),
+foreign key (id_pais) references pais(idpais)
+);
+drop table idioma_pais;
+select * from idioma_pais;
+
+create table ciudad(
+id_ciudad int primary key,
+nombre varchar(20),
+id_pais int,
+foreign key(id_pais) references pais(idpais)
+)
+;
+-- RESVISION DE ESTRUCTURAS DE UNA TABLA
+
+-- COMANDO DESCRIBE O DESC
+
+-- COMANDO SHOW COLUMNS FROM
+-- muestra como se hizo la table el CODIGO;
+use mundo;
+
+show columns from temp;
+
+use biblioteca2;
+
+show create table inscripcion;
+
+-- COMANDO: SHOW TABLE STATUS -> INFORMACION GENERAL DE LA TABLA
+
+show table status like "inscripcion";
+
+
+-- comando_ information_schema.tables y information_schema.columns
+
+select * from information_schema.columns
+where table_name = "inscripcion";
+
+select * from information_schema.tables
+where table_schema = "biblioteca";
+
+-- funciones y comandos en campos en mysql
+-- 1. CONCAT : concatena dos o mas cadenas de texto
+
+use world;
+
+select concat(name, "",region) as ubicacion
+from country
+limit 5;
+
+-- 2. UPPER convierte una cadena a mayuscula
+
+select upper(concat(name,"",region)) as ubicacion
+from country
+limit 5;
+
+-- 3. LOWER convierte una cadena a mayuscula
+
+select LOWER(concat(name,"",region)) as ubicacion
+from country
+limit 5;
+
+-- 4. LENGTH: DEVUELVE LA LONGITUD DE UNA CADENA
+select (concat(name,"",region)) as ubicacion,
+ length(concat(name,"",region)) as largo
+from country
+limit 5;
+
+-- muestre un listado con los tres nombre mas largos, ordenados del mayor al menor
+
+select name ,length(name) as nombre_largo
+from country order by nombre_largo desc
+limit 5;
+
+-- comando: SUBSTRING() ESTRAE UNA PARTE DE UNA CADENA
+
+select substring(concat(name,"",region),1,3) as "Sigla de la ubicacion"
+from country
+limit 5;
+
+-- comando locate; encuentra la pocision de una subcadena
+
+select name from country
+where locate("g")
+limit 5;
+
+-- ------
+
+select substring(name,1,locate(" ", name)) as "compuestos"
+from country
+where locate(" ",name) <> 0;
+-- comando trim: quita los espacios al principio y al final
+-- EL RTRIM QUITA LOS ESPACION A LA DERECHA
+-- LTRIM QUITA LOS ESPACIONS A LA IZQUIERDA
+select substring(name,1, locate(" ",name)) as ALIAS, name
+from country
+where locate(" ",name);
+
+
+-- funciones de campos de mysql
