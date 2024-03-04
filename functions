@@ -1,0 +1,31 @@
+Funciones de Cadena:
+
+CONCAT(str1, str2, ...): Concatena cadenas.
+SUBSTRING(str, start, length): Extrae una subcadena.
+LENGTH(str): Devuelve la longitud de una cadena.
+LOWER(str), UPPER(str): Convierte una cadena a minúsculas o mayúsculas, respectivamente.
+TRIM([{BOTH | LEADING | TRAILING} [remstr] FROM] str): Elimina espacios en blanco de una cadena.
+Funciones Numéricas:
+
+ABS(x): Devuelve el valor absoluto de x.
+ROUND(x, d): Redondea un número a d decimales.
+CEIL(x), FLOOR(x): Devuelve el entero más pequeño/más grande no menor que x.
+Funciones de Fecha y Hora:
+
+NOW(): Devuelve la fecha y hora actuales.
+DATE_FORMAT(date, format): Formatea una fecha según el formato especificado.
+DATEDIFF(date1, date2): Devuelve la diferencia en días entre dos fechas.
+Funciones de Control de Flujo:
+
+IF(expr, true_val, false_val): Retorna un valor dependiendo de si la expresión es verdadera o falsa.
+CASE WHEN condition THEN result WHEN condition THEN result ELSE result END: Realiza evaluaciones condicionales.
+Funciones de Agregación:
+
+SUM(column): Devuelve la suma de los valores de una columna.
+AVG(column): Devuelve el promedio de los valores de una columna.
+COUNT(column): Devuelve el número de filas que coinciden con la condición dada.
+MIN(column), MAX(column): Devuelven el valor mínimo/máximo de una columna.
+Funciones de Búsqueda de Patrones:
+
+LIKE(pattern): Realiza una búsqueda de patrones en una cadena.
+REGEXP(pattern): Realiza una búsqueda de patrones utilizando expresiones regulares.
