@@ -305,5 +305,75 @@ select substring(name,1, locate(" ",name)) as ALIAS, name
 from country
 where locate(" ",name);
 
+select name,replace(name,"Gu","YUL") AS remplazo
+from country
+where region = "South america";
+
+select name,replace(name,"Gu","YUL") AS remplazo
+from country
+where remplazo LIKE "%YUL" ;
+
+
+select name,population, 
+if(population > 40000000,"Es mas de 100mil",if(population < 20000000,"Poblado", "Sobrepoblado")) as superPoblado
+from country
+where region  like "%America";
+
+select name, format(population,0)as Poblacion,
+if(population < 20000000,"Despoblado",if(population < 40000000,"Poblado","Sobrepoblado")) as Densidad
+from country
+where region = "south america";
+
+select * from country;
+
+select name,surfaceArea,Population, (population/surfaceArea) as Division,
+if(population/surfaceArea >= 30 ,"sobrePOBLADO",
+if(population/surfaceArea >= 20 and population/surfaceArea <= 40,"Poblado",if(population/surfaceArea >= 10 and population/surfaceArea <= 20,"poco poblado",
+if(population/surfaceArea < 20,"despoblado","")))) as Estatus
+from country
+where continent = "south america" or continent = "north america" order by Division desc;
+
+create database Animal;
+use Animal;
+-- EJERCICIOS
+create table cat(
+id_gato int primary key,
+nombre varchar(50) not null,
+raza varchar(150) not null,
+color_gato varchar(50),
+edad int,
+sexo varchar(1),
+Juguete_fav varchar(20)
+);
+drop table cat;
+
+INSERT INTO cat (id_gato,nombre,raza,color_gato,edad,sexo,Juguete_fav) 
+values('1',"catico","chandozo","negro",3,"F","peluche"),
+('2',"karl","menkium","gris",2,"M","pelota"),
+('3',"maarl","persa","blanco",4,"M","");
+
+select * from cat;
+-- primero
+select sexo,nombre,Juguete_fav
+as notieneJuguete
+from cat
+where sexo = "M" and juguete_fav = "" ;
+-- segundo
+SELECT id_gato,nombre,raza,color_gato 
+from cat
+where sexo = "M" AND Juguete_fav = ""
+ and raza <> "persa" and raza <> "siamesa";
+ 
+ -- ejercicios world
+ 
+ use world;
+ select * from countrylanguage;
+ select language,countrycode,
+ if(length(language) = 25,"PaisConmasletras","no hay")as longitud
+ from countrylanguage
+ where length(language) = 25 order by longitud desc
+ ;
+
+
 
 -- funciones de campos de mysql
