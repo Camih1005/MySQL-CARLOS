@@ -374,6 +374,32 @@ where sexo = "M" AND Juguete_fav = ""
  where length(language) = 25 order by longitud desc
  ;
 
+ -- conexion entre tablas
+-- PRODUCTO CRUZ TODOS CON TODOS
+select C.CODE, C.NAME, D.ID, D.NAME,D.COUNTRYCODE
+from country as C,city as D;
+
+-- CIUDADES DE COLOMBIA
+
+SELECT P.NAME,C.NAME FROM country AS P
+inner join city as C on P.code = C.countrycode
+where P.name = "colombia";
+
+-- INTERCESECION LEFTT JOINN
+
+-- Los elementos del conjunto A y  donde no exista relacion con B entonces es null
+
+select L.language,P.name  from countrylanguage as L
+left join country as P on L.countrycode = P.code
+where L.language = "Spanish";
+
+insert into countrylanguage(countrycode,language,isofficial,percentage) values("zzz","marciano","T",100);
+
+
+select p.name, c.name
+from city as c right join country as p on c.countrycode = p.code
+where p.name = "colombia"
+
 
 
 -- funciones de campos de mysql
