@@ -403,3 +403,95 @@ where p.name = "colombia"
 
 
 -- funciones de campos de mysql
+-- OTROS EJERCICIOS GROUP BY
+
+-- EJERCICIO 1
+-- 1. Calcula el número total de productos que hay en la tabla productos.
+use tienda;
+SELECT count(p.nombre)as cantidad from producto as p;
+
+-- 2. Calcula el número total de fabricantes que hay en la tabla fabricante.
+
+select count(*)as cantidad from fabricante as f;
+
+-- 3. Calcula el número de valores distintos de 
+-- identificador de fabricante aparecen en la
+-- tabla productos.
+
+select distinct count(id_fabricante) from producto;
+
+-- 4. Calcula la media del precio de todos los productos.
+
+select format(avg(precio),3) from producto;
+
+-- 5 Muestra el precio máximo, precio mínimo,
+-- precio medio y el número total de productos que
+-- tiene el fabricante Crucial.
+
+select max(precio) as MAX,min(precio) as MIN, avg(precio) as medio,
+count(p.nombre)as cantProd from producto as p
+join fabricante as f on  id_fabricante = f.id
+where f.nombre = "crucial";
+
+/* 6 Muestra el número total de productos que tiene cada uno de los fabricantes.
+ El listado también debe incluir los fabricantes que no tienen ningún
+ producto. El resultado mostrará dos columnas, una con el nombre
+ del fabricante y otra con el número de productos que tiene.
+Ordene el resultado descendentemente por el número de productos.*/
+
+select f.nombre as fabricante,count(p.nombre)as cant from fabricante as f
+left join producto as p on p.id_fabricante = f.id
+group by f.nombre
+order by cant desc;
+
+/*7. Muestra el precio máximo, precio mínimo y precio medio de los productos
+ de cada uno de los fabricantes. El resultado mostrará el nombre 
+ del fabricante junto con los datos que se
+solicitan.*/
+
+select f.nombre, max(precio)as MAXX,min(precio) 
+as MINN,AVG(precio) as medio 
+from producto as p
+join fabricante as f on p.id_fabricante = f.id
+group by f.nombre;
+
+
+/*8. Muestra el precio máximo, precio mínimo, precio medio y el 
+número total de productos de los fabricantes que tienen un precio
+ medio superior a 200€. No es necesario mostrar el
+nombre del fabricante, con el identificador del fabricante es suficiente.*/
+
+select id_fabricante, max(precio)as MAXX,min(precio) 
+as MINN,AVG(precio) as medio,count(p.nombre) as cont from producto as p
+join fabricante as f on p.id_fabricante = f.id
+group by id_fabricante
+having medio >= 200
+;
+
+/*9. Muestra el nombre de cada fabricante, junto con el precio máximo,
+ precio mínimo, precio medio y el número total de productos
+ de los fabricantes que tienen un precio medio superior
+a 200€. Es necesario mostrar el nombre del fabricante.*/
+
+select f.nombre, max(precio)as MAXX,min(precio) 
+as MINN,AVG(precio) as medio,count(p.nombre) as cont from producto as p
+join fabricante as f on p.id_fabricante = f.id
+group by f.nombre
+having medio >= 200
+;
+
+/*10. Calcula el número de productos que tienen un precio mayor o igual a 180€.*/
+
+select count(p.nombre) from producto as p
+where p.precio >= 180;
+
+/*11. Calcula el número de productos que tiene cada fabricante con un 
+precio mayor o igual a
+180€.*/
+
+select f.nombre,count(p.nombre) from producto as p
+join fabricante as f on id_fabricante = f.id
+where p.precio >= 180
+group by f.nombre;
+
+select * from producto;
