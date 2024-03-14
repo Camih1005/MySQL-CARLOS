@@ -207,36 +207,83 @@ select p.name,p.population from country as p
     
 SELECT * FROM world.countrylanguage;
 
-delimiter $$ 
-create procedure CalPoblacion(
-inout cantidad int,in paises varchar(100))
+-- ejercicio en casa
+
+delimiter // 
+create procedure ciudadesCONT(in ciudades varchar(100))
+begin 
+	select c.name from city as c
+    join country as p on c.CountryCode = p.code
+    where p.name = UPPER(ciudades);
+END //
+delimiter ;
+
+call ciudadesCONT("colombia");
+
+-- Seleccionar la cantidad de ciudades de un pais y que se vaya acumulando
+drop procedure cantCiudades;
+delimiter //
+create procedure cantCiudades(inout cantidad int,in pais varchar(100))
 begin
-	declare poblacionxd int;
-	select p.name,p.population into cantidad from country as p
-    inner join countrylanguage as l on l.countrycode = p.code
-    where l.isofficial = "T" and p.name = paises;
-    set cantidad = cantidad + poblacionxd;
-    end $$
-    delimiter ;
+	declare guardarIn int;
+	select ifnull(count(c.name),0) into guardarIn from country as p
+	join city as c on p.code = c.countrycode
+    where p.name = pais;
+    set cantidad = cantidad + guardarIn;
+end //
+delimiter ;
+
+set @cantidad := 0;
+call cantCiudades(@cantidad,"brazil");
+select @cantidad;
+
+SELECT * FROM city  ;
+
+-- resto
+drop procedure cantCiudades;
+delimiter //
+create procedure cantCiudades(inout cantidad int,in pais varchar(100))
+begin
+	declare guardarIn int;
+	select ifnull(count(c.name),0) into guardarIn from country as p
+	join city as c on p.code = c.countrycode
+    where p.name = pais;
+    set cantidad = cantidad + guardarIn;
+end //
+delimiter ;
+
+set @cantidad := 0;
+call cantCiudades(@cantidad,"brazil");
+select @cantidad;
+
+
+SELECT IFNULL(COUNT(c.name), 0)
+FROM country AS p
+LEFT JOIN city AS c ON p.code = c.countrycode
+WHERE p.name = 'Colombia';
+
+
+-- ejercicio
+ -- Obtener la población del país especificado que el idioma oficial sea español
+delimiter //
+create procedure PoblacionP(inout cantidad int,in pais varchar(100))
+begin
+	declare Guardador int;
+	select p.population as valiPop into Guardador from country as p
+    join countrylanguage as l  on l.countrycode = p.code 
+    where language = "spanish" and isofficial = "T" and p.name = pais;
+    SET cantidad = cantidad + IF(Guardador > 0, Guardador, 0);
+    end//
+delimiter ;
+drop procedure PoblacionP;
+
+set @poblacionacum = 0;
+call PoblacionP(@poblacionacum,"argentina");
+select format((@poblacionacum),0) as acumulado;
+
+-- validando
+select if(p.population > 0,p.population,"0") as valiPop from country as p
+    join countrylanguage as l  on l.countrycode = p.code 
+    where language = "spanish" and isofficial = "T" and p.name = "brazil";
     
-  drop procedure CalPoblacion;  
-    set @poblacion = 0;
-    call CalPoblacion(@poblacion,"colombia");
-    call CalPoblacion("brazil",@poblacion);
-    select Calpoblacion as cantidades
-    ;
-    -- delimiter $$
-create procedure venderProducto
-(inout beneficio int(255),in id_producto int)
-begin
-	declare precio_producto float;
-    select precio into precio_producto from productos
-    where id = id_producto;
-    set beneficio = beneficio + precio_producto;
-    end $$
-    delimiter ;
-    drop procedure venderProducto;
-    set @beneficio_acumulado = 0;
-    call venderProducto(@beneficio_acumulado,1);
-    call venderProducto(beneficio_acumulado,2);
-    select @beneficio_acumulado as Beneficiototal;
+    select * from country;
