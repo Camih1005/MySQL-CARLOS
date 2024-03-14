@@ -29,3 +29,214 @@ Funciones de Búsqueda de Patrones:
 
 LIKE(pattern): Realiza una búsqueda de patrones en una cadena.
 REGEXP(pattern): Realiza una búsqueda de patrones utilizando expresiones regulares.
+
+
+-- procedimientos almacenados
+
+-- beneficios:  eficiencia -optimizacion -Seguridad 
+-- ventajas : modularidad - mayor rendimiento - seguridad
+
+-- ALGO ASI:
+/*
+ create procedure nombre_procedimiento(parametros)
+ begin
+ -- declaraciones sql y logica del procedimeinto
+ end
+*/
+
+/* 
+CUALES SON LOS PARAMETRO DE ENTRADA Y SALIDA?
+
+IN: el valor del parametro se pasa al pprocedimiento y no se puede ser modificaado dentro
+del procedimiento
+
+OUT: el procedimiento puede cambiar el valor del parametro y este cambio
+se refleja fuera del procedimiento
+
+INOUT: combinacion de IN y OUT. el valor puede ser pasado del procedimiento
+y tambien modificado dentro del mismo
+*/
+
+delimiter //
+create procedure calcularTotal(IN precio DECIMAL(10,2),IN cantidad int,OUT total DECIMAL(10,2))
+begin
+set total = precio * cantidad;
+end//
+
+delimiter ;
+
+set @total = 0;
+call tienda.calcularTotal(10,5,@total);
+select @total;
+
+create database base_ejemplo;
+use base_ejemplo;
+
+create table productos(
+id INT NOT NULL auto_increment,
+nombre varchar(20) not null,
+estado varchar(20) not null default "disponible",
+precio float not null default 0.0,
+primary key(id)
+);
+
+INSERT INTO productos (nombre, estado, precio) VALUES
+('Producto1', 'disponible', 10.99),
+('Producto2', 'disponible', 20.49),
+('Producto3', 'agotado', 5.99),
+('Producto4', 'disponible', 15.29),
+('Producto5', 'disponible', 12.99),
+('Producto6', 'agotado', 8.99),
+('Producto7', 'disponible', 18.79),
+('Producto8', 'agotado', 6.49),
+('Producto9', 'disponible', 22.99),
+('Producto10', 'disponible', 14.99),
+('Producto11', 'disponible', 11.99),
+('Producto12', 'agotado', 9.99),
+('Producto13', 'disponible', 17.99),
+('Producto14', 'disponible', 19.99),
+('Producto15', 'disponible', 16.99),
+('Producto16', 'agotado', 7.99),
+('Producto17', 'disponible', 21.99),
+('Producto18', 'disponible', 24.99),
+('Producto19', 'disponible', 13.99),
+('Producto20', 'agotado', 8.49);
+
+select * from productos;
+
+delimiter $$
+create procedure obtenerProductosPorEstado(in nombre varchar(255))
+begin
+select * from productos where estado = nombre;
+end $$
+
+delimiter ; 
+
+set @nombre = 0;
+call obtenerProductosPorEstado('agotado')
+
+-- otro
+;
+delimiter $$
+create procedure contarProductosPorEstado(
+in estado varchar(20),out numero INT)
+BEGIN
+	Select count(id) into numero FROM productos where estado
+    = estado;
+end $$
+delimiter ; 
+
+set @cantidad_disponible = 0;
+call contarProductosPorEstado("disponible",
+@cantidad_disponible);
+select @cantidad_disponible as productosDisponibles;
+
+
+delimiter $$
+create procedure venderProducto
+(inout beneficio int(255),in id_producto int)
+begin
+	declare precio_producto float;
+    select precio into precio_producto from productos
+    where id = id_producto;
+    set beneficio = beneficio + precio_producto;
+    end $$
+    delimiter ;
+    drop procedure venderProducto;
+    set @beneficio_acumulado = 0;
+    call venderProducto(@beneficio_acumulado,1);
+    call venderProducto(beneficio_acumulado,2);
+    select @beneficio_acumulado as Beneficiototal;
+
+-- ejemplos
+
+use world;
+
+delimiter $$
+create procedure listarCiudadesDePais(
+in nombrePais varchar(100)
+)
+begin 
+	select c.name from country as p
+    inner join city as c on c.countrycode = p.code
+    where upper(p.name) = upper(nombrePais);
+    end $$
+delimiter ;
+drop procedure listarCiudadesDePais;
+call listarCiudadesDePais("Colombia");
+
+
+delimiter $$
+create procedure contarCiudades(
+in nombre_pais varchar(100),out cantidad int
+)
+begin 
+	select count(c.name) into cantidad from country as p
+    inner join city as c on c.countrycode = p.code
+    where upper(p.name) = upper(nombre_pais);
+    end $$
+delimiter ;
+drop procedure contarCiudades;
+
+set @ciudades = 0;
+call contarCiudades("Colombia",@ciudades);
+select @ciudades as cantodadCiud
+
+
+delimiter $$ 
+create procedure CalPoblacion(
+in paises varchar(100),out cantidad int)
+begin
+	select p.name,p.population from country as p
+    inner join countrylanguage as l on l.countrycode = p.code
+    where l.isofficial = "T" and p.name = paises;
+    end $$
+    delimiter ;
+  drop procedure CalPoblacion;  
+    set @poblacion = 0;
+    call CalPoblacion("colombia",@poblacion);
+    call CalPoblacion("brazil",@poblacion);
+    select Calpoblacion as cantidades;
+
+select p.name,p.population from country as p
+    inner join countrylanguage as l on l.countrycode = p.code
+    where l.isofficial = "T" and p.name = "Colombia";
+    
+    -- segundoo
+    
+    
+SELECT * FROM world.countrylanguage;
+
+delimiter $$ 
+create procedure CalPoblacion(
+inout cantidad int,in paises varchar(100))
+begin
+	declare poblacionxd int;
+	select p.name,p.population into cantidad from country as p
+    inner join countrylanguage as l on l.countrycode = p.code
+    where l.isofficial = "T" and p.name = paises;
+    set cantidad = cantidad + poblacionxd;
+    end $$
+    delimiter ;
+    
+  drop procedure CalPoblacion;  
+    set @poblacion = 0;
+    call CalPoblacion(@poblacion,"colombia");
+    call CalPoblacion("brazil",@poblacion);
+    select Calpoblacion as cantidades
+    ;
+    -- delimiter $$
+create procedure venderProducto
+(inout beneficio int(255),in id_producto int)
+begin
+	declare precio_producto float;
+    select precio into precio_producto from productos
+    where id = id_producto;
+    set beneficio = beneficio + precio_producto;
+    end $$
+    delimiter ;
+    drop procedure venderProducto;
+    set @beneficio_acumulado = 0;
+    call venderProducto(@beneficio_acumulado,1);
+    call venderProducto(beneficio_acumulado,2);
+    select @beneficio_acumulado as Beneficiototal;
