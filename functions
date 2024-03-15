@@ -250,6 +250,90 @@ begin
     where p.name = pais;
     set cantidad = cantidad + guardarIn;
 end //
+
+    -- ESTRUCTURA IF-THEN-ELSE
+    /*IF condition then
+      ELSE
+      END IF                */
+    
+-- ACCIONES A REPETIR
+/*LOOP
+ID condicion_salida then
+	leave loop_laber;
+    end if;
+    end loop loop_label*/
+    
+    
+ /*
+ repeat
+	-- acciones a repetir
+ until condition
+ end repeat
+ */   
+ -- es solo cuando es falsa cumple   
+delimiter //
+create procedure aumentarsalario()
+begin
+	repeat
+		update empleados set salario = salario * 1.05 where salario < 3000;
+        until (select count(*)from empleados where salario < 3000)= 0
+        end repeat;
+end//
+delimiter ; 
+
+-- WHILE
+
+/*
+solo si la condicion es verdadera
+while condicion do
+-- acciones a repetir
+end while
+-- primero preguna y despues hace
+*/        
+delimiter // 
+
+/*create procedure contarEMpleadosAltosSalarios()
+begin
+	declare contador int default 0;
+    declare totalEmpleados
+    */
+    
+ -- ESTRUCRTURA CASE   
+    
+/*
+case expresion
+when valor2 then
+--accion a repetir
+when valor3 then
+--accion a repetir
+when valor4 then
+--accion a repetir
+else
+--accion a repeti
+end case
+*/    
+
+-- EXISTE DOS TIPOS DE EXCEPCIONES 
+-- 1.CONTINUE Y EXIT
+-- DECLARE HANDLER0
+
+SELECT SIN(pi()* pi());
+
+use tienda;
+
+drop procedure insertarFabricante;
+delimiter //
+create procedure insertarFabricante(in idFab int,in nombrefabri varchar(100))
+begin 
+declare exit handler for 1062 select concat("error el fabricante ",idFab," ya existe")
+ as error;
+insert into fabricante values(idFab,nombrefabri);
+end//
+delimiter ;
+
+call insertarFabricante(10,"motorola");
+
+
 delimiter ;
 
 set @cantidad := 0;
