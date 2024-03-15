@@ -371,3 +371,47 @@ select if(p.population > 0,p.population,"0") as valiPop from country as p
     where language = "spanish" and isofficial = "T" and p.name = "brazil";
     
     select * from country;
+
+
+
+delimiter // 
+create procedure empleAlt(in entradaFecha date,in salidaFecha date,in Depar int)
+begin
+	select Emp.* from Emp
+    join Dept as d on Emp.Dept_No = d.Dept_No
+    where Fecha_Alt between entradaFecha and  salidaFecha and d.Dept_No = Depar ;
+    end //
+delimiter ;
+drop procedure insertarEmpl;
+call empleAlt("1980-11-19","1988-11-19",20);
+
+-- segundo punto
+
+delimiter //
+create procedure insertarEmpl(in Emp_NoE int,ApellidoE varchar(100),in OficioE varchar(100),in DirE varchar(100)
+,in Fecha_AltE date,in SalarioE DECIMAL,in ComisionE decimal,in Dep_NoE int)
+begin
+	declare exit handler for 1062 select concat("error el EMPLEADO ",Emp_NoE," ya existe")
+	as error;
+	insert into Emp values(Emp_NoE,ApellidoE,OficioE,DirE,Fecha_AltE,SalarioE,ComisionE,Dep_NoE);
+    END//
+delimiter ;
+
+call insertarEmpl(7119,"CELIS","DIRECTOR",6969,"1980-11-19",200000,300000,20);
+    
+select * from Emp;
+
+
+-- tercer punto;
+drop procedure empleNum;
+delimiter // 
+create procedure empleNum(in Depar int)
+begin
+	select count(em.Apellido)as cantidad from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where em.Dept_No = Depar 
+    group by em.Apellido;
+    end //
+delimiter ;
+
+call empleNum(10)
