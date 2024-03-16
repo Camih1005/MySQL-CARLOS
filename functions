@@ -415,3 +415,42 @@ begin
 delimiter ;
 
 call empleNum(10)
+
+-- tercer punto;
+drop procedure empleNum;
+delimiter // 
+create procedure empleNum(in Depar int)
+begin
+	select count(em.Apellido)as cantidad from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where em.Dept_No = Depar 
+    group by em.Apellido;
+    end //
+delimiter ;
+
+call empleNum(10);
+use Hospital;
+-- cuarto
+/*4. Diseñe y construya un procedimiento igual que el anterior, pero que recupere también las
+personas que trabajan en dicho departamento, pasándole como parámetro el nombres*/
+
+delimiter // 
+create procedure empleNum2(in nombreDep varchar(100))
+begin
+
+	select d.Dept_No,d.DNombre,em.Apellido,em.Salario from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where  d.DNombre = nombreDep;
+    
+    select d.Dept_No,d.DNombre,count(em.Apellido)as numeroEmpleados
+    from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where d.DNombre = nombreDep
+    group by d.Dept_No;
+
+    
+    end //
+delimiter ;
+drop procedure empleNum2;
+call empleNum2("contabilidad")
+-- ---
