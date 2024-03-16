@@ -1,0 +1,237 @@
+-- tercer punto;
+drop procedure empleNum;
+delimiter // 
+create procedure empleNum(in Depar int)
+begin
+	select count(em.Apellido)as cantidad from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where em.Dept_No = Depar 
+    group by em.Apellido;
+    end //
+delimiter ;
+
+call empleNum(10);
+use Hospital;
+-- cuarto
+/*4. Diseñe y construya un procedimiento igual que el anterior, pero que recupere también las
+personas que trabajan en dicho departamento, pasándole como parámetro el nombres*/
+
+delimiter // 
+create procedure empleNum2(in nombreDep varchar(100))
+begin
+
+	select d.Dept_No,d.DNombre,em.Apellido,em.Salario from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where  d.DNombre = nombreDep;
+    
+    select d.Dept_No,d.DNombre,count(em.Apellido)as numeroEmpleados
+    from Emp as em
+    join Dept as d on em.Dept_No = d.Dept_No
+    where d.DNombre = nombreDep
+    group by d.Dept_No;
+
+    
+    end //
+delimiter ;
+drop procedure empleNum2;
+call empleNum2("contabilidad")
+-- ---
+
+
+-
+select * from Dept;
+delimiter $$
+create procedure DetalleEmpleados(in nombredept varchar(50))
+begin
+    declare exit handler for 1452
+    select "Error: Departamento no existe";
+
+    select  dt.Dept_No , dt.DNombre, count(ep.emp_no) as cantidad
+    from emp as ep
+    inner join dept as dt on  dt.Dept_No=ep.Dept_No
+    where upper(dt.DNombre)= upper(nombredept)
+    group by  dt.Dept_No , dt.DNombre;
+
+    select  dt.Dept_No , dt.DNombre, ep.Apellido, ep.Salario
+    from emp as ep
+    inner join dept as dt on  dt.Dept_No=ep.Dept_No
+    where upper(dt.DNombre)=upper(nombredept);
+end $$
+delimiter ;
+
+call DetalleEmpleados("contabilidad")
+;
+-- MODULARIDAD ESTRUCTURA
+create database market;
+USE market;
+
+CREATE TABLE Productos (
+    id INT AUTO_INCREMENT,
+    nombre VARCHAR(255),
+    precio DECIMAL(10, 2),
+    stock INT,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE Clientes (
+    id INT AUTO_INCREMENT,
+    nombre VARCHAR(255),
+    email VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE Ventas (
+    id INT AUTO_INCREMENT,
+    producto_id INT,
+    cliente_id INT,
+    cantidad INT,
+    fecha_venta DATE,
+    PRIMARY KEY (id),
+    FOREIGN KEY (producto_id) REFERENCES Productos(id),
+    FOREIGN KEY (cliente_id) REFERENCES Clientes(id)
+);
+
+DELIMITER //
+
+CREATE PROCEDURE AñadirProducto(IN nombre VARCHAR(255),
+ IN precio DECIMAL(10, 2), IN stock INT)
+ begin
+ declare exit handler for 1318,1305 select "Error: Departamento no existe"
+ BEGIN
+    INSERT INTO Productos(nombre, precio, stock)
+    VALUES (nombre, precio, stock);
+    end;
+END 
+delimiter ;
+-- LLAMADOS
+CALL AñadirProducto("1");
+CALL AñadirProducto('Producto 2', 15.49, 30);
+CALL AñadirProducto('Producto 3', 8.99, 20);
+CALL AñadirProducto('Producto 4', 20.99, 40);
+CALL AñadirProducto('Producto 5', 12.99, 60);
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE RegistrarCliente(IN nombre VARCHAR(255), IN email VARCHAR(255))
+BEGIN
+    INSERT INTO Clientes(nombre, email) VALUES (nombre, email);
+END //
+
+DELIMITER ;
+CALL RegistrarCliente('Cliente 1', 'cliente1@example.com');
+CALL RegistrarCliente('Cliente 2', 'cliente2@example.com');
+CALL RegistrarCliente('Cliente 3', 'cliente3@example.com');
+CALL RegistrarCliente('Cliente 4', 'cliente4@example.com');
+CALL RegistrarCliente('Cliente 5', 'cliente5@example.com');
+DELIMITER //
+
+CREATE PROCEDURE RealizarVenta(IN productoID INT, IN clienteID INT, IN cantidad INT)
+BEGIN
+    -- Aquí podrías añadir lógica para actualizar el stock, verificar disponibilidad, etc.
+    INSERT INTO Ventas(producto_id, cliente_id, cantidad, fecha_venta) VALUES (productoID, clienteID, cantidad, CURDATE());
+END //
+
+DELIMITER ;
+CALL RealizarVenta(1, 1, 2); 
+CALL RealizarVenta(2, 2, 1);
+CALL RealizarVenta(3, 3, 3); 
+CALL RealizarVenta(4, 4, 2); 
+CALL RealizarVenta(5, 5, 1); 
+CALL RealizarVenta(1, 2, 1); 
+CALL RealizarVenta(2, 3, 2); 
+CALL RealizarVenta(3, 4, 1); 
+CALL RealizarVenta(4, 5, 3); 
+CALL RealizarVenta(5, 1, 2); 
+
+
+use market;
+create table errores_log(mensajeError VARCHAR(80));
+
+DELIMITER //
+create procedure Manejo_Errores(parametro int)
+begin
+	declare exit handler for 1452,SQLWARNING,NOT FOUND,SQLEXCEPTION as Errorr;
+    begin
+    insert into error_log values(concat
+    ("time:',dato concurrente,'.Error de clave ajena para =",parametro));
+end;
+	insert into errores_log (parametro) 
+DELIMITER ;
+drop procedure Manejo_Errores;
+
+
+;
+delimiter //
+CREATE PROCEDURE prueba(IN campo1 varchar(1), IN campo2 varchar(1))
+begin
+declare exit handler FOR 1062
+begin
+INSERT INTO errores_log VALUES (concat('Time: ', current_date, '. Error nº 1062'));
+end;
+INSERT INTO mitabla (campo1, campo2);
+end ;
+delimiter ;
+
+-- FUNCIONESSS
+/*
+CREATE FUNTION nombre_funcion (parametros)
+returns tipo_retorno
+
+*/
+
+use base_ejemplo;
+
+delimiter //
+
+create function calcAreaCircle(radio double)
+returns double -- tipo que quiere retonar
+deterministic
+begin
+declare area double;
+set area = pi() * radio * radio;
+return area;
+end //
+
+delimiter ;
+select calcAreaCircle(10)
+
+-- funcion que me devuelva la clasificacion de una pelicula
+-- segun su edad
+
+delimiter //
+create function clasifPelicula(edad int)
+returns varchar(30)
+ deterministic
+	begin
+		if edad < 13 then
+			return "Para niños";
+			elseif edad < 18 then
+            return "Para adolecentes";
+            else 
+            return "es para mayores";
+            end if;
+end//
+delimiter ;
+
+select clasifPelicula(15)
+
+delimiter // 
+create function factorial(numero int(1000))
+returns int
+deterministic
+begin
+	declare f int default 1;
+    while numero > 1 do
+    set f = f * numero;
+    set numero = numero - 1;
+    end while;
+    return f;
+    end //
+    delimiter ;
+
+select factorial(120)
+
+--- crear una funcion que devuelva el nombre del coche mas antiguo
+
