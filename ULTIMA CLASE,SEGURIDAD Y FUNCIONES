@@ -1,0 +1,163 @@
+-- lunes 18 marzo
+
+delimiter // 
+create function totalConIva(precio decimal(10,2),tasaIva decimal(5,2))
+returns decimal(10,2)
+
+use tienda;
+
+-- funcion que calcula un descuento
+
+delimiter // 
+create function cacularDescuento(valor decimal(10,2),porcentaje decimal(20,2))
+returns decimal(10,2)
+deterministic
+begin
+	if porcentaje <= 100 and porcentaje > 0 then
+	return valor * (porcentaje/100);
+    elseif porcentaje > 100 then
+		return valor;
+    else 
+		return 0;
+    end if;
+    end //
+delimiter ;
+drop function cacularDescuento;
+
+set @porcentaje = 10;
+select nombre, precio, cacularDescuento(precio,@porcentaje) as descuento,(precio - cacularDescuento(precio,@porcentaje))
+from producto;
+
+create table ventas(
+id int auto_increment,
+vendedor_id int,
+monto_venta decimal(10,2),
+primary key(id)
+);
+delimiter //
+create function CalProm(ventas decimal(10,2))
+returns decimal(10,2)
+	deterministic
+    begin	
+		if ventas > 0 then
+		return ventas * count(ventas) / count(ventas);
+        else 
+			return 0;
+	end if;
+	
+    end //
+    
+delimiter ;
+
+
+
+/* cree una funcion para calcualr el descuento teniendo en cuenta
+la categiria del cliente
+*/
+create table ordenes(
+id int auto_increment,
+cliente_id int,
+precio decimal(10,2),
+categoria_cliente varchar(10),
+primary key(id)
+);
+
+delimiter // 
+create function calcDesc(precio decimal(10,2),categoria varchar(100))
+returns decimal(10,2)
+deterministic
+begin 
+	if categoria = "A" THEN
+    return precio - (precio * 50 / 100);
+    elseif categoria = "B" then
+    return precio - (precio * 20 / 100);
+    else
+		return precio - (precio * 5 / 100);
+	end if;
+  
+end //
+delimiter ;  
+drop function calcDesc;
+SELECT calcDesc(precio,categoria_cliente),precio from ordenes;
+
+INSERT INTO ordenes (cliente_id, precio, categoria_cliente)
+VALUES
+(1, 100.00, 'A'),
+(2, 75.50, 'B'),
+(3, 120.25, 'C');
+
+-- excepciones en mysql
+
+/*signal sqlstate "sqlstate_value" set
+*/
+
+select 1/0;
+
+delimiter //
+create function dividirEntreSi(divisor1 double,divisor2 double)
+returns double
+deterministic
+begin
+if divisor2 = 0 then
+	signal sqlstate "75200" set message_text = "Error division erronea";
+    end if;
+	return divisor1 / divisor2;
+    end // 
+    
+delimiter ;
+drop function dividirEntreSi;
+
+select dividirEntreSi(10,0)  as caca
+ ;
+use tienda;
+
+
+-- SEGURIDAD
+/*USUARIO : ROOT ES EL SUPER USUARIO
+	USUARIO ANONIMO: POR DEFECTO MYSQL
+*/
+SELECT user,host
+from mysql.user;
+
+create user "cacas" @localhost identified by 'cacas2024';
+
+grant select,insert,update on tienda.* to 'cacas'@localhost;
+
+-- prueba es la base de datos que usara
+show grants for 'cacas'@localhost;
+
+drop user "cacas"@localhost;
+
+grant insert on tienda.producto to "cacas"@localhost;
+revoke insert on tienda.producto from 'cacas'@localhost;
+
+-- para poder asignarle cuanto tiempo puede usarlo
+grant usage on tienda.* to "cacas"@localhost;
+alter user "cacas"@"localhost" with max_queries_per_hour 100;
+
+-- eliminar un usuario anonimo -- drop user "cacas"@localhost;
+
+show databases;
+
+
+use mysql;
+
+
+
+alter user "cacas"@localhost identified by "c@c@s2024";
+show grants for 'cacas'@localhost;
+-- esto es para eliminar algunos privilegios
+revoke all privileges,grant option from "cacas"@localhost;
+grant select on tienda.* to "cacas"@localhost;
+
+use tienda;
+create user camilo@localhost identified by "bucaroscampeon";
+grant select (nombre,precio)on tienda.producto to camilo@localhost;
+
+-- esto es para hacer consulas diferentes
+use world;
+select * from city where countrycode = "COL"; 
+prepare stmt from 'select * from city where countrycode = ?';
+
+set @pais = "COL";
+EXECUTE stmt using @pais;
