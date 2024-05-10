@@ -454,3 +454,102 @@ delimiter ;
 drop procedure empleNum2;
 call empleNum2("contabilidad")
 -- ---
+Funciones integradas
+
+Son las funciones que ya vienen implementadas en el motor de MySQL y nos permiten manipular los datos al momento de hacer una consulta. Repasemos algunas de las categorías mas utilizadas con algunos ejemplos:
+Funciones de cadenas
+
+Sirven para operar sobre tipos de datos cadena.
+
+- CONCAT: podemos concatenar dos o mas cadenas en una sola columna. Por ejemplo en una tabla empleados, en base a la columna nombre y apellido podemos obtener una columna con el nombre completo.
+
+SELECT nombre, apellido, CONCAT(nombre, ' ' ,apellido) AS 'Nombre completo' FROM empleados;
+
+ 
+
+- SUBSTRING: podemos obtener una subcadena, desde una cierta posición extraer los siguientes caracteres que definimos en el ultimo parametro.
+
+SELECT descripcion AS 'Producto', SUBSTRING(descripcion, 1, 8) AS 'Subcadena Producto' FROM productos;
+
+- REPLACE: podemos reemplazar una subcadena de una ocurrencia, con otra subcadena. Por ejemplo, en todos los emails, vamos a reemplazar gmail por outlook.
+
+SELECT email, REPLACE(email, 'gmail', 'outlook') AS 'E-mail reemplazado' FROM empleados;
+
+Funciones numéricas
+
+Sirven para operar sobre tipos de datos numéricos.
+
+- SUM: podemos sumar todos los valores de una columna. Por ejemplo, vamos a obtener el valor total de ventas sumando el total de cada una de las ventas.
+
+SELECT SUM(total) AS 'Total' FROM ventas;
+
+- MAX / MIN: podemos obtener el máximo o mínimo valor de un registro. Por ejemplo, obtenemos la venta con valor MAXIMO y otra con el valor MINIMO.
+
+SELECT MAX(total) AS 'Venta Maxima' FROM ventas;
+
+SELECT MIN(total) AS 'Venta Minima' FROM ventas;
+
+- AVG: podemos obtener el promedio de todos los registros en una columna. Por ejemplo, obtenemos el valor promedio de las ventas.
+
+SELECT AVG(total) AS 'Venta Promedio' FROM ventas;
+
+Funciones de fechas
+
+- DATEDIFF: podemos obtener la diferencia en días entre dos fechas. Por ejemplo, vamos a obtener los días que pasaron entre la fecha de una venta y el día actual con la función NOW().
+
+SELECT fecha AS 'Fecha venta', DATEDIFF(NOW(), fecha) AS 'Antiguedad en dias' FROM ventas;
+
+- DAY / MONTH / YEAR: Podemos obtener el dia, el mes o el año de una fecha respectivamente. Veamos un ejemplo con el MES.
+
+SELECT fecha AS 'Fecha venta', MONTH(fecha) AS 'Mes' FROM ventas;
+
+- DATE_FORMAT: nos permite formatear una fecha en base al criterio que creamos necesario. Por ejemplo en este caso vamos a formatear la fecha con el día en numero, el mes con su nombre, y el año en números.
+
+SELECT fecha AS 'Fecha venta', DATE_FORMAT(fecha, '%d %M %Y') AS 'Nuevo formato' FROM ventas;
+
+ 
+Funciones almacenadas
+
+ Las funciones almacenadas son aquellas que podemos definir y reutilizar en sentencias SQL como cualquier otra función definida por el motor de MySQL.
+
+La sintaxis básica de una funcione almacenada es la siguiente:
+
+DELIMITER //
+CREATE FUNCTION nombre_funcion(parametro1 TIPO_DATO, parametroN TIPO_DATO ) RETURNS TIPO_DATO_RETORNO
+  BEGIN
+    declaracion y asignacion de varianles
+    sentencias sql
+  END//
+
+Donde:
+
+CREATE FUNCTION nombre_funcion(parametro1 TIPO_DATO, parametroN TIPO_DATO ): define el nombre de la función y los parámetros que recibirá con sus tipos de datos correspondientes.
+
+RETURNS: indica el tipo de dato que tendrá el valor de salida de la función
+
+BEGIN: determina el inicio de las sentencias que podemos realizar en la función
+
+END: determina el fin de las sentencias
+
+DELIMITER //: es un delimitador que nos permite indicarle al motor de MySQL sobre donde comienza y finaliza un bloque de código, ya que el delimitador predeterminado es el 'punto y coma', y si no definimos uno (en este caso las dos barras), la ejecución de nuestra función va a finalizar al encontrarse el primer 'punto y coma'.
+
+Veamos un ejemplo de una función, por ejemplo, si tenemos una tabla 'empleados' con id, nombre, apellido, email, y queremos con una consulta obtener una columna adicional con un saludo de nombre completo al empleado, si éste tiene un e-mail registrado, de caso contrario, se retornara otro mensaje.
+
+DELIMITER //
+CREATE FUNCTION saludar(nombre VARCHAR(50), apellido VARCHAR(50), email VARCHAR(100)) RETURNS VARCHAR(150)
+  BEGIN
+    DECLARE nombre_completo VARCHAR(100);
+    SET nombre_completo = CONCAT(nombre, ' ', apellido);
+    IF email IS NOT NULL THEN
+      RETURN CONCAT('Bienvenido ', nombre_completo);
+    ELSE
+      RETURN 'Aun no tenes Email';
+    END IF;
+  END//
+
+Cuando escribimos y ejecutamos la función, nos aparecerá en el directorio Functions de nuestro schema, y ahora vamos a poder utilizarla en cualquier consulta que hagamos.
+
+SELECT id, nombre, apellido, email, saludar(nombre, apellido, email) AS 'Saludo' FROM empleados;
+
+Obteniendo el siguiente resultado.
+
